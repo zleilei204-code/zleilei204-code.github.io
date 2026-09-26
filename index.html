@@ -312,15 +312,15 @@
       }
 
       /* 证件照下方的小字介绍：12px、行距放宽
-         对齐：整段左端对齐；末行若不满整行则居中（text-align-last）
-         折行：text-wrap: balance 让各行长度接近，避免中文长句末行只剩一两个字
-               （不支持该属性的旧浏览器退化为常规折行，此时靠上面的末行居中兜底） */
+         对齐：整段两端对齐（左右两端都齐），末行若不满整行则居中（text-align-last）
+         宽度：20rem，与证件照那一栏同宽，避免文字块比圆形证件照宽出半截
+         注意：这里**不要**加 text-wrap: balance —— 它会把各行都压短 30~40px，
+               两端对齐为了补满反而要拉出更大的字间空隙（实测对比过） */
       .hero-photo-note {
-        max-width: 22rem;
+        max-width: 20rem;
         margin-top: 4px;
-        text-align: left;
+        text-align: justify;
         text-align-last: center;
-        text-wrap: balance;
         color: #6b7280;
         font-size: 12px;
         line-height: 1.75;
@@ -364,7 +364,7 @@
             <div class="flex items-start justify-between gap-4 px-6 pt-6 pb-4">
                 <div class="space-y-1">
                     <h3 class="text-lg font-black text-gray-900 tracking-tight">分享这张名片</h3>
-                    <p class="text-xs text-gray-500 font-medium leading-relaxed">保存下面的图片发给朋友，或复制网址直接分享。</p>
+                    <p class="text-xs text-gray-500 font-medium leading-relaxed">感谢分享！保存下面的图片推荐给朋友，或复制网址直接分享。</p>
                 </div>
                 <button type="button" id="share-close" aria-label="关闭分享面板" class="text-gray-400 hover:text-gray-700 p-1 transition-colors flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
