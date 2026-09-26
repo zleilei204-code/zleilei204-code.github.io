@@ -311,11 +311,16 @@
         .target-line { font-size: 14.5px; padding: 8px 18px 9px; }
       }
 
-      /* 证件照下方的小字介绍：窄栏里用 12px、行距放宽，居中于圆形证件照之下 */
+      /* 证件照下方的小字介绍：12px、行距放宽
+         对齐：整段左端对齐；末行若不满整行则居中（text-align-last）
+         折行：text-wrap: balance 让各行长度接近，避免中文长句末行只剩一两个字
+               （不支持该属性的旧浏览器退化为常规折行，此时靠上面的末行居中兜底） */
       .hero-photo-note {
         max-width: 22rem;
         margin-top: 4px;
-        text-align: center;
+        text-align: left;
+        text-align-last: center;
+        text-wrap: balance;
         color: #6b7280;
         font-size: 12px;
         line-height: 1.75;
