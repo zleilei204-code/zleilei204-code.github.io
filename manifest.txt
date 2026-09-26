@@ -10,6 +10,7 @@ images/gallery-7-fair.jpg
 images/gallery-8-betterblue.jpg
 images/logo-berkeley.png
 images/logo-betterblue.jpg
+images/logo-betterblue.png
 images/logo-cicg.jpg
 images/logo-coas.jpg
 images/logo-iycge.png
@@ -21,6 +22,8 @@ images/logo-roots-shoots.jpg
 images/logo-shanshui.png
 images/logo-sysu.png
 images/logo-unv.jpg
+images/logo-vai.png
+images/logo-wjds.png
 images/logo-wwf.jpg
 images/logo-xdf.jpg
 images/research-bluebook-lg.jpg
