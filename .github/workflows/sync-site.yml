@@ -1,0 +1,75 @@
+name: 同步网站到 GitHub Pages
+
+# 触发器刻意只盯住「工作流文件本身」和「清单文件」，这样镜像提交（改 index.html / images）
+# 不会再反过来触发自己，避免无限循环。需要重新同步时，手动 Run workflow 即可。
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-site.yml'
+      - 'manifest.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: sync-site
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BASE: https://leizhao-cv.app.workbuddy.host
+    steps:
+      - name: 取出仓库
+        uses: actions/checkout@v4
+
+      - name: 按 manifest.txt 从成品站下载全部文件
+        run: |
+          set -euo pipefail
+          rm -rf .site
+          mkdir -p .site
+          n=0
+          while IFS= read -r p; do
+            p="$(printf '%s' "$p" | tr -d '\r' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+            if [ -z "$p" ]; then continue; fi
+            mkdir -p ".site/$(dirname "$p")"
+            code="$(curl -sS -L --retry 3 --retry-delay 2 -o ".site/$p" -w '%{http_code}' "$BASE/$p")"
+            printf '%s  %s\n' "$code" "$p"
+            if [ "$code" != "200" ]; then echo "!! $p 下载失败（$code）"; exit 1; fi
+            n=$((n + 1))
+          done < manifest.txt
+          echo "共下载 $n 个文件"
+          du -sh .site
+
+      - name: 覆盖到仓库根目录
+        run: |
+          set -euo pipefail
+          rsync -a --delete \
+            --exclude '.git' --exclude '.github' --exclude '.site' \
+            --exclude 'manifest.txt' --exclude 'README.md' \
+            .site/ ./
+          touch .nojekyll
+          ls -la
+
+      - name: 提交并推送
+        run: |
+          set -euo pipefail
+          git config user.name "leizhao-site-bot"
+          git config user.email "leizhao-site-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "内容没有变化，无需提交"
+          else
+            git commit -m "chore: 同步网站成品 [skip ci]"
+            git push
+          fi
+
+      - name: 确保 Pages 已开启（已开启时忽略报错）
+        run: |
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" \
+            -f "source[branch]=main" -f "source[path]=/" \
+            || echo "Pages 已经是开启状态，跳过"
