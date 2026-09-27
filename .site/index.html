@@ -10,7 +10,11 @@
     <meta name="robots" content="index, follow">
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230A0A0C'/%3E%3Ctext%20x='32'%20y='45'%20font-family='Trebuchet%20MS,Segoe%20UI,Arial,sans-serif'%20font-size='31'%20font-weight='bold'%20fill='%23FFFFFF'%20text-anchor='middle'%3ELZ%3C/text%3E%3C/svg%3E">
     <!-- 分享到微信 / 领英 / 飞书时显示的卡片。抓到卡片的前提：
-         og:url 与 og:image 必须写完整网址（相对路径抓取器取不到），图片用 1200x630 的横版大图。
+         og:url 与 og:image 必须写完整网址（相对路径抓取器取不到）。
+         第 42 轮起 og:image 换成【方形证件照】images/share-photo.jpg（512x512、约 23 KB）：
+         微信、领英、Telegram 的卡片缩略图都是方形，横版 1200x630 大图会被居中裁切，
+         缩到几十像素后连名字都看不清。
+         设计版名片图 images/share-card.jpg 仍保留，供页面「分享本页」面板预览与下载。
          主域名 = GitHub Pages（微信里能直接打开）；workbuddy 域名只作镜像。
          若以后换域名，这几处与 JS 里的 SITE_URL 要一起改。 -->
     <meta property="og:type" content="profile">
@@ -18,16 +22,19 @@
     <meta property="og:site_name" content="赵蕾 Lei Zhao | CV">
     <meta property="og:title" content="赵蕾 Lei Zhao ｜ 个人简历">
     <meta property="og:description" content="中山大学国际政治硕士。生态人文 · 跨文化交流 · AI 赋能。">
-    <meta property="og:image" content="https://zleilei204-code.github.io/images/share-card.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="赵蕾 Lei Zhao 个人简历">
+    <meta property="og:image" content="https://zleilei204-code.github.io/images/share-photo.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="赵蕾 Lei Zhao 证件照">
+    <!-- 显式声明缩略图：部分抓取器（含微信较旧的内核）优先读这一条，og:image 作后备 -->
+    <link rel="image_src" href="https://zleilei204-code.github.io/images/share-photo.jpg">
     <meta property="og:locale" content="zh_CN">
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="赵蕾 Lei Zhao ｜ 个人简历">
     <meta name="twitter:description" content="中山大学国际政治硕士。生态人文 · 跨文化交流 · AI 赋能。">
-    <meta name="twitter:image" content="https://zleilei204-code.github.io/images/share-card.jpg">
-    <meta name="twitter:image:alt" content="赵蕾 Lei Zhao 个人简历">
+    <meta name="twitter:image" content="https://zleilei204-code.github.io/images/share-photo.jpg">
+    <meta name="twitter:image:alt" content="赵蕾 Lei Zhao 证件照">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
