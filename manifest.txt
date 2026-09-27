@@ -33,6 +33,7 @@ images/research-provincial.jpg
 images/research-ssci-lg.jpg
 images/research-ssci.jpg
 images/share-card.jpg
+images/share-photo.jpg
 images/training-green-action-lg.jpg
 images/training-green-action.jpg
 images/training-heritage-lg.jpg
