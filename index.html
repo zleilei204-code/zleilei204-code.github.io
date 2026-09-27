@@ -14,21 +14,23 @@
          第 42 轮起 og:image 换成【方形证件照】images/share-photo.jpg（512x512、约 24 KB）：
          微信、领英、Telegram 的卡片缩略图都是方形，横版 1200x630 大图会被居中裁切，
          缩到几十像素后连名字都看不清。
-         ★ 第 43 轮踩过的两个坑，以后别踩：
+         ★ 踩过的三个坑，以后别踩：
            ① 分享图必须存成 baseline JPEG。渐进式（progressive）编码微信的缩略图
               转存服务解不出来，卡片上只会显示一块灰色破图（生成脚本：work/r43photo.py）。
-           ② body 里第一个图片元素不能是空 src。抓取器会把它当作页面首图，而空 src
-              会被解析成页面地址本身（HTML 不是图片）→ 同样是破图。
+           ② 空 src 的图片会被解析成页面地址本身（HTML 不是图片）→ 同样是破图。
+           ③ 第 44 轮发现：光去掉 src 还不够。只要那张灯箱大图仍排在 body 里图片
+              的第一位，抓取器取「页面首图」时照样先撞上它。现在灯箱整块挪到了
+              body 末尾，并在 body 最前面放了一张真实的方形证件照当「首图锚点」。
          （本注释里别写带尖括号的标签名 —— 验证脚本按尖括号切分文本，会把注释
            后半段误判成正文中文节点。）
          设计版名片图 images/share-card.jpg 仍保留，供页面「分享本页」面板预览与下载。
          主域名 = GitHub Pages（微信里能直接打开）；workbuddy 域名只作镜像。
          若以后换域名，这几处与 JS 里的 SITE_URL 要一起改。 -->
-    <meta property="og:type" content="profile">
+    <meta property="og:type" content="website">
     <meta property="og:url" content="https://zleilei204-code.github.io/">
     <meta property="og:site_name" content="赵蕾 Lei Zhao | CV">
     <meta property="og:title" content="赵蕾 Lei Zhao ｜ 个人简历">
-    <meta property="og:description" content="中山大学国际政治硕士。生态人文 · 跨文化交流 · AI 赋能。">
+    <meta property="og:description" content="中山大学国际政治硕士。">
     <meta property="og:image" content="https://zleilei204-code.github.io/images/share-photo.jpg">
     <meta property="og:image:secure_url" content="https://zleilei204-code.github.io/images/share-photo.jpg">
     <meta property="og:image:type" content="image/jpeg">
@@ -40,7 +42,7 @@
     <meta property="og:locale" content="zh_CN">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="赵蕾 Lei Zhao ｜ 个人简历">
-    <meta name="twitter:description" content="中山大学国际政治硕士。生态人文 · 跨文化交流 · AI 赋能。">
+    <meta name="twitter:description" content="中山大学国际政治硕士。">
     <meta name="twitter:image" content="https://zleilei204-code.github.io/images/share-photo.jpg">
     <meta name="twitter:image:alt" content="赵蕾 Lei Zhao 证件照">
     <script type="application/ld+json">
@@ -766,6 +768,16 @@
 </head>
 <body class="antialiased selection:bg-black selection:text-white bg-black">
 
+    <!-- 分享卡缩略图锚点（第 44 轮）：必须是页面上第一个图片元素，且必须是
+         真实存在、尺寸足够的方形图 —— 社交平台抓「页面首图」时会先命中它。
+         ★ 别把灯箱那张大图挪回首位：它不能带 src（带空 src 会被解析成页面
+         地址本身），排在首位就会让抓取器取到空图，卡片变成没有缩略图。
+         隐藏方式是「1px 渲染尺寸 + 完全透明 + 置于底层 + 不吃指针事件」：
+         不用 display:none（部分抓取器会跳过隐藏元素）、不用 loading=lazy
+         （懒加载图同样被跳过）、也不用 left:-9999px 移出视口 —— 那样会被
+         本站的横向溢出自检判成越界元素。width/height 属性仍写 512，供抓取器读取。 -->
+    <img src="images/share-photo.jpg" alt="Lei Zhao" width="512" height="512" style="position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1">
+
     <!-- Toast 复制提示框 -->
     <div id="toast" class="fixed bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[90] max-w-[92vw] bg-gray-900 text-white text-xs font-bold px-5 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 border border-gray-700">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-green-400" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
@@ -776,26 +788,6 @@
     <button id="back-to-top" aria-label="回到页面顶部" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-5 sm:bottom-8 sm:right-8 z-40 bg-white/90 text-black p-3 sm:p-3.5 rounded-full shadow-xl border border-gray-200 opacity-0 pointer-events-none transition-all duration-300 hover:bg-black hover:text-white hover:scale-110">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
     </button>
-
-    <!-- 照片放大浏览层 -->
-    <div id="lightbox" role="dialog" aria-modal="true" aria-label="照片大图浏览" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm items-center justify-center p-4 sm:p-8">
-        <button type="button" id="lb-close" aria-label="关闭大图" class="absolute top-3 right-3 sm:top-6 sm:right-6 z-10 text-white/70 hover:text-white p-3 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
-        <button type="button" id="lb-prev" aria-label="上一张" class="absolute left-1 sm:left-4 z-10 text-white/70 hover:text-white p-3 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <button type="button" id="lb-next" aria-label="下一张" class="absolute right-1 sm:right-4 z-10 text-white/70 hover:text-white p-3 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
-        <figure class="max-w-5xl w-full flex flex-col items-center gap-3 select-none">
-            <!-- 注意：这里的 src 必须留空不写 —— 空 src 会被分享抓取器当成
-                 页面首图并解析成页面地址，导致分享卡缩略图变破图。大图在
-                 openLightbox() 打开时用 JS 赋值。 -->
-            <img id="lb-img" alt="" class="max-h-[76vh] w-auto max-w-full rounded-2xl shadow-2xl">
-            <figcaption id="lb-cap" class="text-white/85 text-xs sm:text-sm font-bold tracking-wide text-center"></figcaption>
-        </figure>
-    </div>
 
     <!-- 分享面板：平台（微信等）不会抓本页做卡片，这里让人直接保存名片图 / 复制网址 -->
     <div id="share-panel" role="dialog" aria-modal="true" aria-label="分享本页" class="hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm items-center justify-center p-4 sm:p-6">
@@ -2470,6 +2462,26 @@
     </script>
 
     <!-- JS 逻辑控制 -->
+    <!-- 照片放大浏览层 -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="照片大图浏览" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm items-center justify-center p-4 sm:p-8">
+        <button type="button" id="lb-close" aria-label="关闭大图" class="absolute top-3 right-3 sm:top-6 sm:right-6 z-10 text-white/70 hover:text-white p-3 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        <button type="button" id="lb-prev" aria-label="上一张" class="absolute left-1 sm:left-4 z-10 text-white/70 hover:text-white p-3 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button type="button" id="lb-next" aria-label="下一张" class="absolute right-1 sm:right-4 z-10 text-white/70 hover:text-white p-3 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <figure class="max-w-5xl w-full flex flex-col items-center gap-3 select-none">
+            <!-- 注意：这里的 src 必须留空不写 —— 空 src 会被分享抓取器当成
+                 页面首图并解析成页面地址，导致分享卡缩略图变破图。大图在
+                 openLightbox() 打开时用 JS 赋值。 -->
+            <img id="lb-img" alt="" class="max-h-[76vh] w-auto max-w-full rounded-2xl shadow-2xl">
+            <figcaption id="lb-cap" class="text-white/85 text-xs sm:text-sm font-bold tracking-wide text-center"></figcaption>
+        </figure>
+    </div>
+
     <script>
         // 1. 滚动动画控制器 (Intersection Observer 监测元素进入视口)
         document.addEventListener('DOMContentLoaded', () => {
